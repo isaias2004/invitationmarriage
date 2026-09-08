@@ -114,6 +114,7 @@ p { margin-top: 0; }
 .photo-frame { height: 650px; padding: 12px; background: var(--white); box-shadow: var(--shadow); transform: rotate(-1.3deg); }
 .photo-frame img { height: 100%; }
 .story-text p:not(.eyebrow) { color: #6d6e65; max-width: 480px; }
+.story-text p { margin-top: 18px; }
 .signature { margin-top: 30px; font-family: var(--serif); font-size: 2.4rem; color: var(--olive); }
 
 /* PLACE */
@@ -163,6 +164,7 @@ cite { font-size: .78rem; letter-spacing: .12em; font-style: normal; color: #ded
 /* RSVP */
 .rsvp { background: var(--paper); }
 .tiny { margin-top: 18px; color: #96968d; font-size: .72rem; }
+.rsvp .button { margin-top: 18px; }
 
 /* FOOTER */
 footer { background: var(--olive-dark); color: #d9dacd; padding: 32px 0; }
