@@ -145,13 +145,103 @@
       </div>
     </section>
 
-    <section class="rsvp section" id="rsvp">
-      <div class="container narrow center">
-        <p class="eyebrow olive">TE ESPERAMOS</p>
-        <h2>Queremos que seas parte de nuestra historia</h2>
-        <a class="button button-dark" href="https://wa.me/" target="_blank" rel="noopener">Confirmar asistencia</a>
+    <section id="rsvp">
+  <div class="rv-wrap">
+    <p class="rv-eyebrow">Te esperamos</p>
+    <h2>Queremos que seas parte de <em>nuestra historia</em></h2>
+    <p class="rv-intro">Confirmá tu asistencia completando este breve formulario.</p>
+
+    <form id="rv-form" novalidate>
+      <div>
+        <label class="rv-label" for="rv-nombre">Nombre y apellido</label>
+        <input type="text" id="rv-nombre" name="nombre" placeholder="Ej: María Pérez" autocomplete="name" required>
       </div>
-    </section>
+
+      <div>
+        <span class="rv-label" style="display:block">¿Nos acompañás?</span>
+        <div class="rv-opciones">
+          <label><input type="radio" name="asistencia" value="Sí" checked><span>Sí, ahí estaré</span></label>
+          <label><input type="radio" name="asistencia" value="No"><span>No puedo ir</span></label>
+        </div>
+      </div>
+
+      <div>
+        <label class="rv-label" for="rv-coment">Comentarios <span style="text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <textarea id="rv-coment" name="comentarios" placeholder="Alergias, restricciones alimentarias, un mensaje para nosotros…"></textarea>
+      </div>
+
+      <!-- trampa para bots: si se completa, no se envía -->
+      <div class="rv-hp" aria-hidden="true">
+        <input type="text" name="web" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button class="rv-btn" id="rv-enviar" type="submit">Confirmar asistencia</button>
+      <p class="rv-msg" id="rv-msg" role="status"></p>
+    </form>
+
+    <div class="rv-gracias" id="rv-gracias">
+      <div class="rv-orn">✦</div>
+      <h3 id="rv-gracias-titulo">¡Gracias por confirmar!</h3>
+      <p id="rv-gracias-texto">Recibimos tu respuesta. Nos vemos pronto ♡</p>
+    </div>
+  </div>
+</section>
+
+
+<script>
+(function () {
+  /* Pegá acá el link de "Aplicación web" que te da Google Apps Script
+     (termina en /exec). Ver instrucciones aparte. */
+  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLMIpXN3twSSi3PvsIwdO7Vk8PCR7IIiwF1JnvDKRMQa2CeKNbaCB3D-6XfTPdbLgu9g/exec";
+
+  var form = document.getElementById("rv-form");
+  var btn = document.getElementById("rv-enviar");
+  var msg = document.getElementById("rv-msg");
+  var gracias = document.getElementById("rv-gracias");
+  if (!form) return;
+
+  function error(t) { msg.className = "rv-msg rv-error"; msg.textContent = t; }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    msg.className = "rv-msg"; msg.textContent = "";
+
+    var f = new FormData(form);
+    var nombre = (f.get("nombre") || "").trim();
+    if (f.get("web")) return;                         // bot
+    if (nombre.split(/\s+/).length < 2 || nombre.length < 4) {
+      error("Por favor escribí tu nombre y apellido."); return;
+    }
+    if (!SCRIPT_URL) { error("Falta configurar el formulario."); return; }
+
+    btn.disabled = true; btn.textContent = "Enviando…";
+
+    var datos = new URLSearchParams();
+    datos.append("nombre", nombre);
+    datos.append("asistencia", f.get("asistencia"));
+    datos.append("comentarios", (f.get("comentarios") || "").trim());
+
+    // no-cors: evita problemas de CORS con Google. No se puede leer la
+    // respuesta, así que si el envío no falla por red, se da por recibido.
+    fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: datos })
+      .then(function () {
+        var viene = f.get("asistencia") === "Sí";
+        document.getElementById("rv-gracias-titulo").textContent =
+          viene ? "¡Gracias por confirmar!" : "Gracias por avisarnos";
+        document.getElementById("rv-gracias-texto").textContent =
+          viene ? "Recibimos tu respuesta. Nos vemos pronto ♡"
+                : "Lamentamos que no puedas acompañarnos. ¡Te mandamos un abrazo grande!";
+        form.style.display = "none";
+        gracias.style.display = "block";
+      })
+      .catch(function () {
+        error("No pudimos enviar tu respuesta. Probá de nuevo en un momento.");
+        btn.disabled = false; btn.textContent = "Confirmar asistencia";
+      });
+  });
+})();
+</script>
+
   </main>
 
   <footer>
